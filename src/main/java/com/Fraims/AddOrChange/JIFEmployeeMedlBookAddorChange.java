@@ -258,28 +258,32 @@ public class JIFEmployeeMedlBookAddorChange extends MainInternalFrame {
     }
     // ====================== установка значений в таблицы ========================     
     private void FillTableBaseEmployeesUnder(){
-        Employee SerhEmpl = new Employee();
-        Integer Limit = Integer.valueOf(jComboBox7.getSelectedItem().toString());
-        if (jCheckBox2.isSelected()) Limit = -1;
-        String Text = jTextField13.getText();
-        if (Text.equals("Поиск по таблице (Номер ЛМК, ФИО, Должность)")) Text = "";
-        
-        SerhEmpl.setNumMedicalBook(1);
-        SerhEmpl.setTextSearch(Text);
-        SerhEmpl.setIsDeleted(false);
-        SerhEmpl.setMainEmployeeId(employee.getMainEmployeeId());
-        EmployeeTMUnder = new SQLQuery<>(SerhEmpl).ReadForTable(Limit);
-        Object[] Data;
-        while(TableEmployeesUnder.getRowCount()>0)
-            TableEmployeesUnder.removeRow(0);
-        for (Employee v : EmployeeTMUnder.values()) {
-            if (v.getId()>0){
-                Data = v.getDataForTableEmpUnder();
-                Data[0] = TableEmployeesUnder.getRowCount()+1;                
-                TableEmployeesUnder.insertRow(TableEmployeesUnder.getRowCount(), Data);
+        try{
+            Employee SerhEmpl = new Employee();
+            Integer Limit = Integer.valueOf(jComboBox7.getSelectedItem().toString());
+            if (jCheckBox2.isSelected()) Limit = -1;
+            String Text = jTextField13.getText();
+            if (Text.equals("Поиск по таблице (Номер ЛМК, ФИО, Должность)")) Text = "";
+
+            SerhEmpl.setNumMedicalBook(1);
+            SerhEmpl.setTextSearch(Text);
+            SerhEmpl.setIsDeleted(false);
+            SerhEmpl.setMainEmployeeId(employee.getMainEmployeeId());
+            EmployeeTMUnder = new SQLQuery<>(SerhEmpl).ReadForTable(Limit);
+            Object[] Data;
+            while(TableEmployeesUnder.getRowCount()>0)
+                TableEmployeesUnder.removeRow(0);
+            for (Employee v : EmployeeTMUnder.values()) {
+                if (v.getId()>0){
+                    Data = v.getDataForTableEmpUnder();
+                    Data[0] = TableEmployeesUnder.getRowCount()+1;                
+                    TableEmployeesUnder.insertRow(TableEmployeesUnder.getRowCount(), Data);
+                }
             }
+            new TableResize().setTableColumnsWidth(jTEmployeesUnder,500);
+        }catch (Exception c){
+            System.out.println("com.Fraims.AddOrChange.JIFEmployeeMedlBookAddorChange.FillTableBaseEmployeesUnder()");
         }
-        new TableResize().setTableColumnsWidth(jTEmployeesUnder,500);
     }    
     // *******************************************************************
     
@@ -340,7 +344,7 @@ public class JIFEmployeeMedlBookAddorChange extends MainInternalFrame {
             SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd"); 
             medicalBook.setNumMedicalBook(Integer.valueOf(jTFNumMedBook.getText()));
             medicalBook.setIsDeleted(jChBMedicalBookIsDeleted.isSelected());
-            medicalBook.setBorneDiseases(StringToEnumBorneDeseases(jTFBorneDiseases.getText()));
+            medicalBook.setBorneDiseases(stringToEnumBorneDeseases(jTFBorneDiseases.getText()));
 
             medicalBook.setRubella(ft.parse(jTFRubella.getText()));
             medicalBook.setDiphtheria(ft.parse(jTFDiphtheria.getText()));

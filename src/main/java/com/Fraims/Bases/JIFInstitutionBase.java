@@ -777,6 +777,10 @@ public class JIFInstitutionBase extends MainInternalFrame {
 
     private void jTInstitutionsMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTInstitutionsMouseReleased
         getSelectedUnitsFromTable();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            getSelectedUnitsFromTable();
+        JTable source = (JTable)evt.getSource();
+            int row = source.rowAtPoint( evt.getPoint() );
+            int column = source.columnAtPoint( evt.getPoint() );
+        jTInstitutions.setRowSelectionInterval(row, row);
         if (evt.getClickCount()>=2){ 
             if (isChoiseInstitution){
                 choiseJIFToOpen();                
@@ -789,9 +793,7 @@ public class JIFInstitutionBase extends MainInternalFrame {
         
         if (evt.isPopupTrigger())
         {
-            JTable source = (JTable)evt.getSource();
-            int row = source.rowAtPoint( evt.getPoint() );
-            int column = source.columnAtPoint( evt.getPoint() );
+            
             if ( row>=0){
                 if (source.getSelectedRowCount()<=1)
                     source.changeSelection(row, column, false, false);                

@@ -98,9 +98,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
                         jButton2.setText("ДОБАВИТЬ ЛМК");
                         //jTFEmploymentDate.setEnabled(false);
                         jButton2.setEnabled(false);
-                        IsNewMedicalBook = true;
-                        FillFieldsEmployee(employee);
-                        FillFieldsMedBook();
+                        IsNewMedicalBook = true;                        
                     }
                     else {
                         medicalBook.setDateChange(new Date());
@@ -112,7 +110,8 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
                         }
                     medicalBook.setRegionId(MBProgect.getRegionId());
 
-                    
+                    FillFieldsEmployee(employee);
+                    FillFieldsMedBook();
                               
                     medicalBook.setRegionId(SelectedRegionId);
                     employee.setRegionId(SelectedRegionId);
@@ -130,7 +129,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
     private void FillFieldsEmployee(Employee Empl){
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         jBChoiseEmployee.setEnabled(MBProgect.getStringPrivEmployee().contains("VIEW") || MBProgect.getStringPrivEmployee().contains("CHANGE"));
-        jBEmployeeCuratorDelete.setEnabled(jBChoiseEmployee.isSelected());
+        jBEmployeeCuratorDelete.setEnabled(jBChoiseEmployee.isEnabled());
         jChBMedicalBookIsDeleted.setEnabled(userPrivilege.getPrivMedicalBook().contains(DELET_ALL));
         // ==================== ГЛАВНАЯ ====================    
         if (Empl.getId()>0){
@@ -142,7 +141,8 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
             jLEmpBerthday.setText(df.format(Empl.getBerthday()).equals("01.01.1970") ? "" : df.format(Empl.getBerthday()));
             jLEmpGroup.setText(Empl.getUsGroupName());    
             jLEmpDepartment.setText(Empl.getUsDepartmentName());  
-            jLEmpPosition.setText(Empl.getUsPositionName());              
+            jLEmpPosition.setText(Empl.getUsPositionName()); 
+            jLabel8.setText(df.format(Empl.getEmploymentDate()));  
                         
             //jTAEmployeeNote.setText(employee.getNote());
         } else {
@@ -155,6 +155,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
             jLEmpGroup.setText("сотрудник не выбран");    
             jLEmpDepartment.setText("сотрудник не выбран");  
             jLEmpPosition.setText("сотрудник не выбран");  
+            jLabel8.setText("сотрудник не выбран");  
             
             //jTAEmployeeNote.setText("сотрудник не выбран");
         }          
@@ -196,8 +197,38 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
             jTFNumMedBook.setText(medicalBook.getNumMedicalBook().toString());
             jChBMedicalBookIsDeleted.setSelected(medicalBook.isIsDeleted());
             jLEmploymentDate.setText(df.format(medicalBook.getEmploymentDate()));
+            
             // ==================== прививки ====================
-            jTFBorneDiseases.setText(enumToString(medicalBook.getBorneDiseases()));
+            String str = enumToString(medicalBook.getBorneDiseases());
+            StringBuilder borneDiseases = new StringBuilder();
+            if (!str.isEmpty()){
+                if (str.contains("Rubella")){
+                    borneDiseases.append("Краснуха,");
+                    jTFRubella.setEnabled(false);
+                }
+                if (str.contains("Measles")){
+                    borneDiseases.append("Корь,");                
+                    jTFMeasles.setEnabled(false);
+                    jTFMeasles_2.setEnabled(false);
+                }
+                if (str.contains("Diphtheria")){
+                    borneDiseases.append("Дифтерия,");
+                    jTFDiphtheria.setEnabled(false);
+                }
+                if (str.contains("Hepatitis_A")){
+                    borneDiseases.append("Геппатит А,");
+                    jTFHepatitis_A.setEnabled(false);
+                    jTFHepatitis_A2.setEnabled(false);
+                }
+                if (str.contains("Hepatitis_B")){
+                    borneDiseases.append("Геппатит Б,");
+                    jTFHepatitis_B.setEnabled(false);
+                    jTFHepatitis_B2.setEnabled(false);
+                    jTFHepatitis_B3.setEnabled(false);
+                }
+                
+                jTFBorneDiseases.setText(borneDiseases.toString().substring(0, borneDiseases.length() - 1));
+            }
 
             jTFRubella.setText(df.format(medicalBook.getRubella()).equals("01.01.1970") ? "" : df.format(medicalBook.getRubella()));
             jTFDiphtheria.setText(df.format(medicalBook.getDiphtheria()).equals("01.01.1970") ? "" : df.format(medicalBook.getDiphtheria()));
@@ -211,7 +242,10 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
 
             jTFHepatitis_A.setText(df.format(medicalBook.getHepatitis_A()).equals("01.01.1970") ? "" : df.format(medicalBook.getHepatitis_A()));
             jTFHepatitis_A2.setText(df.format(medicalBook.getHepatitis_A2()).equals("01.01.1970") ? "" : df.format(medicalBook.getHepatitis_A2()));
-            jTFhepatitisAvaccine.setText(enumToString(medicalBook.getHepatitisAvaccine()));
+            
+            if (enumToString(medicalBook.getHepatitisAvaccine()).equals(""))
+                jCBhepatitisAvaccine.setSelectedItem(0);
+            else jCBhepatitisAvaccine.setSelectedItem(enumToString(medicalBook.getHepatitisAvaccine()));
 
             // ==================== периодиеские ==================== 
             jTFShigellvak.setText(df.format(medicalBook.getShigellvak()).equals("01.01.1970") ? "" : df.format(medicalBook.getShigellvak()));
@@ -255,7 +289,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
 
             jTFHepatitis_A.setText("");
             jTFHepatitis_A2.setText("");
-            jTFhepatitisAvaccine.setText("");
+            jCBhepatitisAvaccine.setSelectedIndex(0);
 
             // ==================== периодиеские ====================
             jTFShigellvak.setText("");
@@ -292,7 +326,26 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
             SimpleDateFormat ft = new SimpleDateFormat ("dd.MM.yyyy"); 
             medBook.setNumMedicalBook(Integer.valueOf(jTFNumMedBook.getText()));
             medBook.setIsDeleted(jChBMedicalBookIsDeleted.isSelected());
-            medBook.setBorneDiseases(StringToEnumBorneDeseases(jTFBorneDiseases.getText()));
+//            Rubella,
+//            Diphtheria,
+//            Measles,
+//            Hepatitis_A,
+//            Hepatitis_B
+            StringBuilder borneDiseases = new StringBuilder();
+            if (!jTFBorneDiseases.getText().isEmpty()){
+                if (jTFBorneDiseases.getText().contains("краснуха") || jTFBorneDiseases.getText().contains("Краснуха"))
+                    borneDiseases.append("Rubella,");
+                if (jTFBorneDiseases.getText().contains("Корь") || jTFBorneDiseases.getText().contains("корь"))
+                    borneDiseases.append("Measles,");
+                if (jTFBorneDiseases.getText().contains("Дифтерия") || jTFBorneDiseases.getText().contains("дифтерия"))
+                    borneDiseases.append("Diphtheria,");
+                if (jTFBorneDiseases.getText().contains("Геппатит А") || jTFBorneDiseases.getText().contains("геппатит А"))
+                    borneDiseases.append("Hepatitis_A,");
+                if (jTFBorneDiseases.getText().contains("Геппатит Б") || jTFBorneDiseases.getText().contains("геппатит Б"))
+                    borneDiseases.append("Hepatitis_B,");
+                
+                medBook.setBorneDiseases(stringToEnumBorneDeseases(borneDiseases.toString().substring(0, borneDiseases.length() - 1)));
+            }           
 
             //medBook.setEmploymentDate(ft.parse(jTFEmploymentDate.getText().equals("") ? "01.01.1970" : jTFEmploymentDate.getText()));
             
@@ -308,7 +361,10 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
 
             medBook.setHepatitis_A(ft.parse(jTFHepatitis_A.getText().equals("") ? "01.01.1970" : jTFHepatitis_A.getText()));
             medBook.setHepatitis_A2(ft.parse(jTFHepatitis_A2.getText().equals("") ? "01.01.1970" : jTFHepatitis_A2.getText()));
-            medBook.setHepatitisAvaccine(StringToEnumHepatitisAvaccine(jTFhepatitisAvaccine.getText()));
+            
+            if (jCBhepatitisAvaccine.getSelectedIndex()==0)
+                medBook.setHepatitisAvaccine(StringToEnumHepatitisAvaccine(""));
+            else  medBook.setHepatitisAvaccine(StringToEnumHepatitisAvaccine(jCBhepatitisAvaccine.getSelectedItem().toString()));
 
             medBook.setShigellvak(ft.parse(jTFShigellvak.getText().equals("") ? "01.01.1970" : jTFShigellvak.getText()));
 
@@ -562,6 +618,11 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
         jPanel9 = new javax.swing.JPanel();
         jLabel94 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        jPanel8 = new javax.swing.JPanel();
+        jButton4 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jButton3 = new javax.swing.JButton();
+        jLabel89 = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
@@ -578,7 +639,6 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
         jTFHepatitis_B3 = new javax.swing.JTextField();
         jTFHepatitis_A = new javax.swing.JTextField();
         jTFHepatitis_A2 = new javax.swing.JTextField();
-        jTFhepatitisAvaccine = new javax.swing.JTextField();
         jTFBorneDiseases = new javax.swing.JTextField();
         jLabel33 = new javax.swing.JLabel();
         jLabel34 = new javax.swing.JLabel();
@@ -600,6 +660,8 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
         jLabel52 = new javax.swing.JLabel();
         jLabel53 = new javax.swing.JLabel();
         jLabel72 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jCBhepatitisAvaccine = new javax.swing.JComboBox<>();
         jPanel6 = new javax.swing.JPanel();
         jTFShigellvak = new javax.swing.JTextField();
         jTFTherapist = new javax.swing.JTextField();
@@ -643,11 +705,8 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
         jLabel78 = new javax.swing.JLabel();
         jLabel80 = new javax.swing.JLabel();
         jTAMedBookNote = new javax.swing.JTextArea();
-        jPanel8 = new javax.swing.JPanel();
-        jButton4 = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
-        jLabel89 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
@@ -711,6 +770,54 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
                     .addComponent(jLabel94)
                     .addComponent(jButton1))
                 .addContainerGap(437, Short.MAX_VALUE))
+        );
+
+        jPanel8.setBackground(new java.awt.Color(255, 255, 255));
+
+        jButton4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jButton4.setText("Добавить фото");
+        jButton4.setEnabled(false);
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("нет фото");
+        jLabel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        jButton3.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jButton3.setText("Х");
+        jButton3.setEnabled(false);
+
+        jLabel89.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel89.setForeground(new java.awt.Color(153, 153, 153));
+        jLabel89.setText("Пусть к файлу: ");
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 341, Short.MAX_VALUE)
+                        .addComponent(jButton3))
+                    .addComponent(jLabel89, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(13, 13, 13))
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton4)
+                    .addComponent(jButton3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel89)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jPanel10.setBackground(new java.awt.Color(255, 255, 255));
@@ -809,13 +916,6 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
 
         jTFHepatitis_A2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
 
-        jTFhepatitisAvaccine.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jTFhepatitisAvaccine.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTFhepatitisAvaccineActionPerformed(evt);
-            }
-        });
-
         jTFBorneDiseases.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
 
         jLabel33.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -878,6 +978,10 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
         jLabel72.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel72.setText("Перенесенные заболевания");
 
+        jLabel11.setText("Пример: Краснуха, Корь, ...");
+
+        jCBhepatitisAvaccine.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "не выбрано", "Algawak", "Avaxim", "Wakta" }));
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -885,69 +989,73 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel72, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(jLabel33, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTFRubella, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel34))
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(jLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTFDiphtheria, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel36))
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTFMeasles, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel38))
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTFMeasles_2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel42))
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTFHepatitis_B, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel44))
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTFHepatitis_B2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel46))
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(jLabel47, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTFHepatitis_B3, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel48))
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(jLabel49, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTFHepatitis_A, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel50))
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(jLabel51, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTFHepatitis_A2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel52))
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(jLabel53, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jTFhepatitisAvaccine)))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(174, 174, 174)
-                        .addComponent(jTFBorneDiseases, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)))
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTFBorneDiseases, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                            .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel72, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel33, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTFRubella, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel34))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTFDiphtheria, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel36))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTFMeasles, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel38))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel41, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTFMeasles_2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel42))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel43, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTFHepatitis_B, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel44))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel45, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTFHepatitis_B2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel46))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel47, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTFHepatitis_B3, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel48))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel49, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTFHepatitis_A, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel50))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel51, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTFHepatitis_A2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel52))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel53, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCBhepatitisAvaccine, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(12, 12, 12))
         );
         jPanel5Layout.setVerticalGroup(
@@ -957,7 +1065,9 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel72)
                     .addComponent(jTFBorneDiseases, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(27, 27, 27)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel33)
                     .addComponent(jTFRubella, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1005,8 +1115,8 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel53)
-                    .addComponent(jTFhepatitisAvaccine, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                    .addComponent(jCBhepatitisAvaccine, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(176, 176, 176))
         );
 
         jTabbedPane1.addTab("ЛМК - Прививки", jPanel5);
@@ -1115,7 +1225,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
 
         jCBValidationForYear.setBackground(new java.awt.Color(255, 255, 255));
         jCBValidationForYear.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jCBValidationForYear.setText("Аттестация на год");
+        jCBValidationForYear.setText("Годовалая аттестация");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -1281,6 +1391,8 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
         jTAMedBookNote.setRows(5);
         jTAMedBookNote.setBorder(javax.swing.BorderFactory.createTitledBorder("Примечание"));
 
+        jLabel7.setText("Дата траудоустройства сотрудника: ");
+
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
@@ -1305,11 +1417,21 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
                             .addComponent(jLabel78)
                             .addComponent(jLabel76))))
                 .addGap(12, 12, 12))
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(53, 53, 53)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(22, 22, 22)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel75, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTFIntestinalInfection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1330,56 +1452,6 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
         );
 
         jTabbedPane1.addTab("ЛМК - При поступлении", jPanel7);
-
-        jPanel8.setBackground(new java.awt.Color(255, 255, 255));
-
-        jButton4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jButton4.setText("Добавить фото");
-        jButton4.setEnabled(false);
-
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("нет фото");
-        jLabel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        jButton3.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jButton3.setText("Х");
-        jButton3.setEnabled(false);
-
-        jLabel89.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel89.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel89.setText("Пусть к файлу: ");
-
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
-                        .addComponent(jButton4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 341, Short.MAX_VALUE)
-                        .addComponent(jButton3))
-                    .addComponent(jLabel89, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(13, 13, 13))
-        );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton4)
-                    .addComponent(jButton3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel89)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        jTabbedPane1.addTab("ЛМК - фото", jPanel8);
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -1562,7 +1634,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel84)
                     .addComponent(jLEmploymentDate))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(jLEmpFIO))
@@ -1586,7 +1658,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel19)
                     .addComponent(jLEmpPosition))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel16)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1706,7 +1778,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(jButton10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButton10, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -1751,10 +1823,6 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
     private void formInternalFrameClosing(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosing
         closeThis();
     }//GEN-LAST:event_formInternalFrameClosing
-
-    private void jTFhepatitisAvaccineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFhepatitisAvaccineActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTFhepatitisAvaccineActionPerformed
 
     private void jTFTherapistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFTherapistActionPerformed
         // TODO add your handling code here:
@@ -1823,6 +1891,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JCheckBox jCBValidationForYear;
+    private javax.swing.JComboBox<String> jCBhepatitisAvaccine;
     private javax.swing.JCheckBox jChBMedicalBookIsDeleted;
     private javax.swing.JLabel jLEmpBerthday;
     private javax.swing.JLabel jLEmpDepartment;
@@ -1838,6 +1907,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
     private javax.swing.JLabel jLMainInstitution;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
@@ -1883,6 +1953,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
     private javax.swing.JLabel jLabel67;
     private javax.swing.JLabel jLabel68;
     private javax.swing.JLabel jLabel69;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel70;
     private javax.swing.JLabel jLabel71;
     private javax.swing.JLabel jLabel72;
@@ -1893,6 +1964,7 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
     private javax.swing.JLabel jLabel77;
     private javax.swing.JLabel jLabel78;
     private javax.swing.JLabel jLabel79;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel80;
     private javax.swing.JLabel jLabel81;
     private javax.swing.JLabel jLabel82;
@@ -1937,7 +2009,6 @@ public class JIFMedBookAddorChange extends MainInternalFrame {
     private javax.swing.JTextField jTFTherapist;
     private javax.swing.JTextField jTFTyphoidFever;
     private javax.swing.JTextField jTFValidation;
-    private javax.swing.JTextField jTFhepatitisAvaccine;
     private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration//GEN-END:variables
 

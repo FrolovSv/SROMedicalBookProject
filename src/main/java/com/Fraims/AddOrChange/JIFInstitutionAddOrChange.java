@@ -269,27 +269,31 @@ public class JIFInstitutionAddOrChange extends MainInternalFrame {
     
     // ====================== установка значений в таблицы ========================     
     private void FillTableBaseEmployeesUnder(){
-        Employee SearhEmpl = new Employee();
-        String Text = jTFSearchEmpl.getText();  
-        if (Text.equals("Поиск по таблице (Номер, Адрес)")) Text = "";
-        Integer Limit = Integer.valueOf(jComboBox7.getSelectedItem().toString());
-        if (jCheckBox2.isSelected()) Limit = -1;        
-        SearhEmpl.setTextSearch(Text);
-        SearhEmpl.setIsDeleted(jCBIsDeleted.isSelected());   
-        SearhEmpl.setInstitutionId(SelectedInstitutionId);
-        
-        EmployeeTMUnder = new SQLQuery(SearhEmpl).ReadForTable(Limit);
-        Object[] Data;
-        while(TableEmployeesUnder.getRowCount()>0)
-            TableEmployeesUnder.removeRow(0);
-        for (Employee v : EmployeeTMUnder.values()) {
-            if (v.getId()>0){
-                Data = v.getDataForTableEmpUnder();
-                Data[0] = TableEmployeesUnder.getRowCount()+1;
-                TableEmployeesUnder.insertRow(TableEmployeesUnder.getRowCount(), Data);
+        try{
+            Employee SearhEmpl = new Employee();
+            String Text = jTFSearchEmpl.getText();  
+            if (Text.equals("Поиск по таблице (Номер, Адрес)")) Text = "";
+            Integer Limit = Integer.valueOf(jComboBox7.getSelectedItem().toString());
+            if (jCheckBox2.isSelected()) Limit = -1;        
+            SearhEmpl.setTextSearch(Text);
+            SearhEmpl.setIsDeleted(jCBIsDeleted.isSelected());   
+            SearhEmpl.setInstitutionId(SelectedInstitutionId);
+
+            EmployeeTMUnder = new SQLQuery(SearhEmpl).ReadForTable(Limit);
+            Object[] Data;
+            while(TableEmployeesUnder.getRowCount()>0)
+                TableEmployeesUnder.removeRow(0);
+            for (Employee v : EmployeeTMUnder.values()) {
+                if (v.getId()>0){
+                    Data = v.getDataForTableEmpUnder();
+                    Data[0] = TableEmployeesUnder.getRowCount()+1;
+                    TableEmployeesUnder.insertRow(TableEmployeesUnder.getRowCount(), Data);
+                }
             }
+            jTEmployeesUnder = new TableResize().setTableColumnsWidth(jTEmployeesUnder,500);
+        }catch(Exception ex){
+            System.out.println("com.Fraims.AddOrChange.JIFInstitutionAddOrChange.FillTableBaseEmployeesUnder()");
         }
-        jTEmployeesUnder = new TableResize().setTableColumnsWidth(jTEmployeesUnder,500);
     }
     
     private void FillTableBaseInstitutionUnder(){

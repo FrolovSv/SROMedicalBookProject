@@ -91,7 +91,7 @@ public class SQLQuery<AbstactClass extends MainClassProgect> extends SQLConnecti
             sqlEx.getMessage();
             System.out.println("com.SQL.SQLQuery.SQLSelectTable() -" + sqlEx.getMessage());
             closeConnection();
-        }catch (NullPointerException ex){
+        }catch (Exception ex){
             ex.getMessage();
             System.out.println("com.SQL.SQLQuery.SQLSelectTable() -" + ex.getMessage());
             closeConnection();

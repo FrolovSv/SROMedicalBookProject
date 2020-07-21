@@ -4,16 +4,10 @@ package com.Fraims.AddOrChange;
 import com.Class.Employee;
 import com.Class.Employee.EnumSex;
 import com.Class.Institution;
-import static com.Class.Institution.InstitutionType.*;
-import com.Class.MainClassProgect;
-import static com.notUse.InternalFrameViewable.*;
 import com.Class.MedicalBook;
-import com.Class.ReferralVaccinations;
 import com.Class.TableResize;
-import com.Class.TypeUnit;
 import com.Class.UsGroup;
 import com.Class.UserPrivilege;
-import com.Class.UserPrivilege.PrivilegeDefault;
 import static com.Class.UserPrivilege.PrivilegeDefault.*;
 import com.Progect.MedicalBookProgectMaven;
 import com.Progect.MedicalBookProgectMaven.statusFrame;
@@ -513,6 +507,7 @@ public class JIFEmployeeAddOrChange extends MainInternalFrame {
                 MBProgect.setSelectedInstitutionId(-1);
                 //MBProgect.openBaseEmployees(statusFrame.VIEW, null);
                 if (MBProgect.getJIFMedBookBase()!=null) MBProgect.openBaseMedicalBook(statusFrame.VIEW, null);
+                if (MBProgect.getJIFEmployeesBase()!=null) MBProgect.openBaseEmployees(statusFrame.VIEW, null);
             }
         }catch(Exception ex){
             System.out.println("Fraims.JIFAddorChangeEmployee.SaveOrAdd() " + ex.getMessage());

@@ -79,37 +79,48 @@ public class Employee extends MainClassProgect<Employee>{
     
     @Override
     public Object[] getDataForTable() { 
+        try{
 //        String Name = getUsPositionName();
 //        if (Name.length()>20){
 //            Name = Name.substring(0, 20).concat("...");
 //        }
+            MedicalBook MB = new MedicalBook();
+            if (getNumMedicalBook()!=null && getNumMedicalBook()>0){
+                MB = new SQLQuery<>(new MedicalBook()).Read(getNumMedicalBook());
+            }
+
+
+            String Department = "";
+            if (getInstitutionId() == null)
+                Department = getUsDepartmentName();
+            else if (getInstitutionId() > 0)
+                Department = getInstitutionName();
+            else if (getInstitutionId() == 0)
+                Department = getUsDepartmentName();
+
+            Object[] DataForTable = new Object[9];
+            DataForTable[0] = (int) 1;
+            DataForTable[1] = getId();
+            DataForTable[2] = getUsGroupName();
+            DataForTable[3] = Department;
+            DataForTable[4] = getUsPositionName();
+            DataForTable[5] = getFullName();
+            DataForTable[6] = getPhone1() + "; "+ getPhone2();
+            DataForTable[7] = getNumMedicalBook() <=0 ? "" : getNumMedicalBook();
+            DataForTable[8] = getNumMedicalBook()!=null && getNumMedicalBook()>0 ? (MB.checkValidMedicalBook().containsValue(true) ?  "Норма" : "Просрочено" ): "";   
+
+            return DataForTable;  
+        }catch(Exception e){
+            System.out.println("com.Class.Employee.getDataForTable()");
+            return null; 
+        }
+    }
+    public Object[] getDataForTableEmpUnder() throws Exception{
         MedicalBook MB = new MedicalBook();
         if (getNumMedicalBook()!=null && getNumMedicalBook()>0){
             MB = new SQLQuery<>(new MedicalBook()).Read(getNumMedicalBook());
         }
-            
-            
-        String Department = "";
-        if (getInstitutionId() == null)
-            Department = getUsDepartmentName();
-        else if (getInstitutionId() > 0)
-            Department = getInstitutionName();
-        else if (getInstitutionId() == 0)
-            Department = getUsDepartmentName();
-        
-        Object[] DataForTable = new Object[9];
-        DataForTable[0] = (int) 1;
-        DataForTable[1] = getId();
-        DataForTable[2] = getUsGroupName();
-        DataForTable[3] = Department;
-        DataForTable[4] = getUsPositionName();
-        DataForTable[5] = getFullName();
-        DataForTable[6] = getPhone1() + "; "+ getPhone2();
-        DataForTable[7] = getNumMedicalBook() <=0 ? "" : getNumMedicalBook();
-        DataForTable[8] = getNumMedicalBook()!=null && getNumMedicalBook()>0 ? (MB.checkValidMedicalBook() ?  "Норма" : "Просрочено" ): "";   
-        return DataForTable;        
-    }
-    public Object[] getDataForTableEmpUnder() {
+
         Object[] DataForTable = new Object[6];
         String Name = getUsPositionName();
         if (Name.length()>20){
@@ -117,22 +128,23 @@ public class Employee extends MainClassProgect<Employee>{
             Name = Name.concat("...");
         }
         //#пп АЙДИ группа подразделение должность фио телефон номер ЛМК
-        
+
         DataForTable[0] = (int) 1;
         DataForTable[1] = getId();
         DataForTable[2] = Name;
         DataForTable[3] = getSurnameInitials(getLastName(),getName(),getPatronymic());
         DataForTable[4] = getNumMedicalBook() <=0 ? "" : getNumMedicalBook();        
-        DataForTable[5] = "Норма";        
-        return DataForTable;        
+        DataForTable[5] = getNumMedicalBook()!=null && getNumMedicalBook()>0 ? (!MB.checkValidMedicalBook().containsValue(false) ?  "Норма" : "Просрочено" ): ""; ;        
+        return DataForTable;  
     }   
 
     
     // ========================== установки sql ============================
     // ==================== геттеры  SELECT ====================
     @Override
-    public String getQuerySelect(Integer Limit, Integer EmployeeId){
-        String str = "SELECT "        
+    public String getQuerySelect(Integer Limit, Integer EmployeeId) throws NullPointerException{
+        StringBuilder str = new StringBuilder();
+            str.append("SELECT "        
                 + "EM.`Id`, EM.`LastName`, EM.`Name`, EM.`Patronymic`, UsDepartment.`Id`, "
                 + "UsGroup.`Id`, EM.`UsPositionId`, EM.`Sex`, EM.`Phone1`, EM.`Phone2`, "
                 + "EM.`Email`, EM.`Photo`, EM.`Berthday`, EM.`Note`, EM.`DateAdd`, "
@@ -149,8 +161,8 @@ public class Employee extends MainClassProgect<Employee>{
                 + "LEFT join `TypeUnit` on (UsGroup.TypeUnitId = TypeUnit.Id) "
                 + (EmployeeId <= 0 ? "" : "Where EM.Id = "+ EmployeeId+" ")
                 + "GROUP BY EM.`id` "
-                + (Limit <= 0 ? "" : "Limit "+Limit);
-        return str;                
+                + (Limit <= 0 ? "" : "Limit "+Limit));
+        return str.toString();                
     }    
     @Override
     public String getQuerySelectTable(Integer Limit){
@@ -254,7 +266,7 @@ public class Employee extends MainClassProgect<Employee>{
                 + "`Email`=?, `Photo`=?, `Berthday`=?, `Note`=?, `DateAdd`=?, "
                 + "`DateChange`=?, `EmployeeAddId`=?, `EmployeeChangeId`=?, `NumMedicalBook`=?, `isDeleted`=?, "
                 + "`RegionId`=?, `MainEmployeeId`=?, `RootId`=?, `IsAccessLogin`=?, `Login`=?, "
-                + "`Password`=?, `InstitutionId`=?, InstitutionType = ?, EM.EmploymentDate = ? "
+                + "`Password`=?, `InstitutionId`=?, InstitutionType = ?, EmploymentDate = ? "
                 + "WHERE `Employee`.`Id` = " + UnitId;
         return str;                
     }
@@ -354,12 +366,12 @@ public class Employee extends MainClassProgect<Employee>{
     // ==================== PreparedStatment UPSERT ====================
     @Override
     public void setPreparedStatment(PreparedStatement ps) throws SQLException{
-//                + "`LastName`=?,`Name`=?,`Patronymic`=?,`UsDepartmentId`=?,"
-//                + "`UsGroupId`=?,`UsPositionId`=?,`Sex`=?,`Phone1`=?,`Phone2`=?,"
-//                + "`Email`=?,`Photo`=?,`Berthday`=?,`Note`=?,`DateAdd`=?,"
-//                + "`DateChange`=?,`EmployeeAddId`=?,`EmployeeChangeId`=?,`NumMedicalBook`=?,`isDeleted`=?,"
-//                + "`RegionId`=?, `MainEmployeeId`=?, `RootId`=?, `IsAccessLogin`=?, `Login`=?, "
-//                + "`Password`=?, `InstitutionId`=?, InstitutionType = ?"
+//    + "`LastName`=?, `Name`=?, `Patronymic`=?, "
+//    + "`UsPositionId`=?, `Sex`=?, `Phone1`=?, `Phone2`=?, "
+//    + "`Email`=?, `Photo`=?, `Berthday`=?, `Note`=?, `DateAdd`=?, "
+//    + "`DateChange`=?, `EmployeeAddId`=?, `EmployeeChangeId`=?, `NumMedicalBook`=?, `isDeleted`=?, "
+//    + "`RegionId`=?, `MainEmployeeId`=?, `RootId`=?, `IsAccessLogin`=?, `Login`=?, "
+//    + "`Password`=?, `InstitutionId`=?, InstitutionType = ?, EM.EmploymentDate = ? "
         ps.setString(1, this.getLastName());                
         ps.setString(2, this.getName());              
         ps.setString(3, this.getPatronymic());          

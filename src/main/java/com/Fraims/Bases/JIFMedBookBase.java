@@ -855,25 +855,32 @@ public class JIFMedBookBase extends MainInternalFrame {
     }//GEN-LAST:event_formInternalFrameClosing
 
     private void jTMedaicalBookMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTMedaicalBookMouseReleased
-        getSelectedUnitsFromTable();
-        if (evt.getClickCount() >= 2) {
-            if (isChoiseMedicalBook) {
-                choiseJIFToOpen();
-            } else {
-                //открыть окно краткого просмотра информации
-                //MBProgect.openAddChangeMedicalBook();                      
-            }
-        }
-
-        if (evt.isPopupTrigger()) {
+        try{
             JTable source = (JTable) evt.getSource();
             int row = source.rowAtPoint(evt.getPoint());
             int column = source.columnAtPoint(evt.getPoint());
-            if (row >= 0) {
-                source.changeSelection(row, column, false, false);
-                MBProgect.setSelectedNumMedBook(Integer.valueOf((Integer) source.getModel().getValueAt(source.convertRowIndexToModel(source.getSelectedRow()), 1)));
-                jPMTable.show(evt.getComponent(), evt.getX(), evt.getY());
+            jTMedaicalBook.setRowSelectionInterval(row, row);
+            
+            getSelectedUnitsFromTable();
+            if (evt.getClickCount() >= 2) {
+                if (isChoiseMedicalBook) {
+                    choiseJIFToOpen();
+                } else {
+                    //открыть окно краткого просмотра информации
+                    //MBProgect.openAddChangeMedicalBook();                      
+                }
             }
+
+            if (evt.isPopupTrigger()) {
+                
+                if (row >= 0) {
+                    source.changeSelection(row, column, false, false);
+                    MBProgect.setSelectedNumMedBook(Integer.valueOf((Integer) source.getModel().getValueAt(source.convertRowIndexToModel(source.getSelectedRow()), 1)));
+                    jPMTable.show(evt.getComponent(), evt.getX(), evt.getY());
+                }
+            }
+        }catch(Exception ex){
+            System.out.println("com.Fraims.Bases.JIFMedBookBase.jTMedaicalBookMouseReleased()");
         }
     }//GEN-LAST:event_jTMedaicalBookMouseReleased
 

@@ -514,6 +514,11 @@ public class JIFUsersRootBase extends javax.swing.JInternalFrame {
 
     private void jTUserRootMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTUserRootMouseReleased
         getChoiseUserRootId();
+        JTable source = (JTable)evt.getSource();
+        int row = source.rowAtPoint( evt.getPoint() );
+        int column = source.columnAtPoint( evt.getPoint() );
+        
+        jTUserRoot.setRowSelectionInterval(row, row);
         if (evt.getClickCount()>=2){ 
             if (isChoiseUserRoot){
                 choiseJIFToOpen();
@@ -526,9 +531,7 @@ public class JIFUsersRootBase extends javax.swing.JInternalFrame {
         
         if (evt.isPopupTrigger())
         {
-            JTable source = (JTable)evt.getSource();
-            int row = source.rowAtPoint( evt.getPoint() );
-            int column = source.columnAtPoint( evt.getPoint() );
+            
             if ( row>=0){
                 source.changeSelection(row, column, false, false);                
                 MBProgect.setSelectedEmployeeId(Integer.valueOf((Integer)source.getModel().getValueAt(source.convertRowIndexToModel(source.getSelectedRow()), 1)));

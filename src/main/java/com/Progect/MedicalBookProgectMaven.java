@@ -123,6 +123,8 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
         UsPositionTM = new SQLQuery<>(new UsPosition()).Read(-1, -1);
         TypeUnitTM = new SQLQuery<>(new TypeUnit()).Read(-1, -1);
         
+        jLabel1.setText("Предварительная загрузка данных прошла успешно.");
+        
         ApplicationOfAccessRights();
         
         
@@ -168,6 +170,8 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
         //this.setEmployee(45);
         //openAddChangeEmployee(); 
         //openAddChangeEmployeeAndMedicalBook();
+        SelectedNumMedBook = 332211;
+        openAddChangeMedicalBook();
     }
     
     public void ApplicationOfAccessRights(){
@@ -219,11 +223,13 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
         jMIUserPrivilegeBase.setEnabled(!StringPrivUser.contains("NULL"));
         jMIUserPrivilegeAdd.setEnabled(!StringPrivUser.contains("NULL"));
         //jMIUserPrivilegeChange.setEnabled(!StringPrivUser.contains("NULL"));
+        jLabel1.setText("Устанвка прав доступа прошла успешно");
    }   
 
 
     // ======================= открытие рабочих окон =======================
-    public void openBaseMedicalBook(statusFrame Status, InternalFrameUI JIFUI){        
+    public void openBaseMedicalBook(statusFrame Status, InternalFrameUI JIFUI){     
+        jLabel1.setText("Открытие базы медицинских книжек");
         if (StringPrivMedicalBook.contains("VIEW") || StringPrivMedicalBook.contains("CHANGE")){
             if (JIFMedBookBase==null){
                 if (JIFUI==null)
@@ -260,6 +266,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     }
     
     public void openBaseUserRoot() {
+        jLabel1.setText("Открытие базы прав пользователей");
         if (StringPrivUser.contains("VIEW")){
             if (JIFUsersRootBase== null) {
                 JIFUsersRootBase = new JIFUsersRootBase(this);
@@ -281,6 +288,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     }
     
     public void openBaseEmployees(statusFrame Status, InternalFrameUI JIFUI){
+        jLabel1.setText("Открытие базы сотруднико");
         if (StringPrivEmployee.contains("VIEW") || StringPrivEmployee.contains("CHANGE")){
             if (JIFEmployeesBase==null){
                 if (JIFUI==null)
@@ -318,6 +326,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     }
     
     public void openUserPrivilege(statusFrame Status, InternalFrameUI JIFUI){
+        jLabel1.setText("Открытие базы прав пользователей");
         if (StringPrivSettings.contains("PRIVILEGE") || StringPrivEmployee.contains("PRIVILEGE")){
             if (JIFUserPrivilegeBase==null){
                 if (JIFUI==null)
@@ -354,6 +363,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     }
     
     public void openBaseInstitutions(statusFrame Status, InternalFrameUI JIFUI){
+        jLabel1.setText("Открытие базы учереждений");
         if (StringPrivInstitution.contains("VIEW") || StringPrivInstitution.contains("CHANGE")){
             if (JIFInstitutionBase==null){
                 if (JIFUI==null)
@@ -393,6 +403,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     
     // ======================= открытие рабочих окон =======================
     public void openAddChangeMedicalBook(){
+        jLabel1.setText("Открытие формы измнеения данных медицинской книжки");
         if (StringPrivMedicalBook.contains("CHANGE") || StringPrivMedicalBook.contains("DELET")){
             if (JIFMedBookAddorChange==null){
                 JIFMedBookAddorChange = new JIFMedBookAddorChange(this);
@@ -414,6 +425,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     }
        
     public void openAddChangeEmployeeAndMedicalBook(){
+        jLabel1.setText("Открытие формы добавления сотрудника и медицинской книжки");
         if ((StringPrivEmployee.contains("CHANGE") || StringPrivMedicalBook.contains("DELET")) &
                 (StringPrivMedicalBook.contains("CHANGE") || StringPrivMedicalBook.contains("DELET"))){
             if (JIFEmployeeMedlBookAddorChange==null){
@@ -436,6 +448,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     }
     
     public void openAddOrChangeEmployee() {
+        jLabel1.setText("Открытие формы изменения данных сотрудника");
         if (StringPrivEmployee.contains("CHANGE") || StringPrivMedicalBook.contains("DELET")){
             if (JIFEmployeeAddOrChange == null) {
                 JIFEmployeeAddOrChange = new JIFEmployeeAddOrChange(this);
@@ -456,6 +469,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     }
     
     public void openAddOrChangeInstitution() {
+        jLabel1.setText("Открытие формы изменения данных учереждения");
         if (StringPrivInstitution.contains("CHANGE") || StringPrivInstitution.contains("DELET")){
             if (JIFInstitutionAddOrChange == null) {
                 JIFInstitutionAddOrChange = new JIFInstitutionAddOrChange(this);
@@ -476,6 +490,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     }
     
     public void openUsGroup() {
+        jLabel1.setText("Открытие базы групп пользователей");
         if (StringPrivUser.contains("VIEW")){
             if (JIFUsGroup == null) {
                 JIFUsGroup = new JIFUsGroup(this);
@@ -496,6 +511,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     }
     
     public void openAddOrChangeUserPrivilege() {
+        jLabel1.setText("Открытие формы изменения прав доступа сотрудников");
         if (StringPrivUser.contains("CHANGE") || StringPrivUser.contains("DELET")){
             if (JIFUserPrivilegeChange == null) {
                 JIFUserPrivilegeChange = new JIFUserPrivilegeChange(this);
@@ -562,6 +578,8 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     private void initComponents() {
 
         jDesktopPane1 = new javax.swing.JDesktopPane();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMMenu = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -640,7 +658,21 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
         );
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 596, Short.MAX_VALUE)
+            .addGap(0, 564, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
         );
 
         jMMenu.setText("ФАЙЛ");
@@ -918,10 +950,14 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jDesktopPane1)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jDesktopPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jDesktopPane1)
+                .addGap(0, 0, 0)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -1077,6 +1113,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane jDesktopPane1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMEmployee;
     private javax.swing.JMenuItem jMIEmployeeAdd;
     private javax.swing.JMenuItem jMIEmployeeAndMedicalBookAdd;
@@ -1122,6 +1159,7 @@ public class MedicalBookProgectMaven extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem21;
     private javax.swing.JMenuItem jMenuItem22;
     private javax.swing.JMenuItem jMenuItem25;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JPopupMenu.Separator jSeparator11;

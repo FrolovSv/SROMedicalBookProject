@@ -257,7 +257,7 @@ public abstract class MainInternalFrame extends javax.swing.JInternalFrame {
         return enumToString(EnumList, ",");
     }
     
-    public ArrayList<EnumBorneDiseases> StringToEnumBorneDeseases(String String) {
+    public ArrayList<EnumBorneDiseases> stringToEnumBorneDeseases(String String) {
         ArrayList<EnumBorneDiseases> arrayList = new ArrayList<>();
         String[] subString = new String[10];
         if (String != null) {

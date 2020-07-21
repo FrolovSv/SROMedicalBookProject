@@ -2,17 +2,12 @@ package com.Fraims.Bases;
 
 import com.Class.*;
 import com.Progect.MedicalBookProgectMaven;
-import com.Progect.MedicalBookProgectMaven.statusFrame;
 import static com.Class.UserPrivilege.PrivilegeDefault.*;
-import com.SQL.SQLConnection;
 import com.SQL.SQLQuery;
 import com.notUse.MainInternalFrame;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.TreeMap;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.plaf.InternalFrameUI;
 import javax.swing.table.DefaultTableModel;
@@ -62,14 +57,19 @@ public class JIFEmployeesBase extends MainInternalFrame {
     
     @Override
     public JIFEmployeesBase view(){
-        isChoiseEployee = false;        
-        fillFieldsMain();
-        verificationData();        
-        this.setVisible(true);
-        jBAddEmp.setText("ДОБАВИТЬ нового сотрудника");
-        jBAddEmp.setEnabled(true);
-        jCBEmployeeWithoutMedicalBook.setSelected(false);
-        return this;
+        try{
+            isChoiseEployee = false;        
+            fillFieldsMain();
+            verificationData();        
+            this.setVisible(true);
+            jBAddEmp.setText("ДОБАВИТЬ нового сотрудника");
+            jBAddEmp.setEnabled(true);
+            jCBEmployeeWithoutMedicalBook.setSelected(false);
+            return this;
+        }catch(Exception ex){
+            System.out.println("com.Fraims.Bases.JIFEmployeesBase.view()");
+            return this;
+        }
     }
     
     // ================== обяъвление класса ==================
@@ -92,10 +92,11 @@ public class JIFEmployeesBase extends MainInternalFrame {
     // ================== загрузка данных и установка значений ==================
     public boolean verificationData(){
         try{
-            Thread MBThread = new Thread(new Runnable(){
+            Thread MBThread;
+            MBThread = new Thread(new Runnable(){
                 @Override
                 public void run() {
-                    try{   
+                    try{
                         //TreeMap<Integer,Employee> employeeTM = new TreeMap<>(); 
                         
                         Integer Limit = (jChBAll.isSelected() ? -1 : Integer.valueOf(jCBLimitCount.getSelectedItem().toString()));
@@ -112,7 +113,7 @@ public class JIFEmployeesBase extends MainInternalFrame {
 
                         Employee searchEmployee = new Employee();
                         searchEmployee.setMainEmployeeId(SelectedMainEmployeeId);
-                        searchEmployee.setTypeUnitId(TypeUnit);                        
+                        searchEmployee.setTypeUnitId(TypeUnit);
                         searchEmployee.setIsDeleted(jChBDeleted.isSelected());                        
                         searchEmployee.setTextSearch(TextSearch);
                         
@@ -148,6 +149,11 @@ public class JIFEmployeesBase extends MainInternalFrame {
                             if (v.getId()>0){
                                 Data = v.getDataForTable();
                                 Data[0] = TableEmployee.getRowCount()+1;
+//                                String str = "";
+//                                for (Object object : Data) {
+//                                    str += object + "; ";
+//                                }
+//                                System.out.println(str);
                                 TableEmployee.insertRow(TableEmployee.getRowCount(), Data);
                             }
                         }
@@ -248,10 +254,11 @@ public class JIFEmployeesBase extends MainInternalFrame {
 
     ////====================== прочее //======================    
     
-    private void getSelectedUnitsFromTable(){
-        if (jTEmployees.getSelectedRow()>=0){
-            SelectedEmployeeId = Integer.valueOf((Integer)jTEmployees.getValueAt(jTEmployees.convertRowIndexToModel(jTEmployees.getSelectedRow()), 1));
-            String NumMedBook = jTEmployees.getValueAt(jTEmployees.convertRowIndexToModel(jTEmployees.getSelectedRow()), 7).toString();
+    private void getSelectedUnitsFromTable(int row){
+        if (row>=0){
+            jTEmployees.setRowSelectionInterval(row, row);
+            SelectedEmployeeId = Integer.valueOf((Integer)jTEmployees.getValueAt(jTEmployees.convertRowIndexToModel(row), 1));
+            String NumMedBook = jTEmployees.getValueAt(jTEmployees.convertRowIndexToModel(row), 7).toString();
             SelectedNumMedicalBook = !NumMedBook.equals("") ? Integer.valueOf(NumMedBook) : 0;
             //String NameInstitution = jTEmployees.getValueAt(jTEmployees.convertRowIndexToModel(jTEmployees.getSelectedRow()), 3).toString();
             //if (new SQLQuery<>(new Institution()).)
@@ -446,8 +453,6 @@ public class JIFEmployeesBase extends MainInternalFrame {
             }
         });
 
-        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
-
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel1.setText("Место для вашей рекламы");
 
@@ -457,15 +462,11 @@ public class JIFEmployeesBase extends MainInternalFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1085, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
         );
 
         jPanel14.setBackground(new java.awt.Color(255, 255, 255));
@@ -673,7 +674,7 @@ public class JIFEmployeesBase extends MainInternalFrame {
                         .addComponent(jChBAll))
                     .addComponent(jSeparator14, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 565, Short.MAX_VALUE))
         );
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
@@ -845,8 +846,8 @@ public class JIFEmployeesBase extends MainInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 650, Short.MAX_VALUE))
+                .addGap(0, 0, 0)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -873,28 +874,35 @@ public class JIFEmployeesBase extends MainInternalFrame {
     }//GEN-LAST:event_jCBLimitCountActionPerformed
 
     private void jTEmployeesMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTEmployeesMouseReleased
-        JTable source = (JTable)evt.getSource();
-        int row = source.rowAtPoint( evt.getPoint() );
-        int column = source.columnAtPoint( evt.getPoint() );
+        try{
+            JTable source = (JTable)evt.getSource();
+            int row = source.rowAtPoint( evt.getPoint() );
+            int column = source.columnAtPoint( evt.getPoint() );
 
-        getSelectedUnitsFromTable();
-        if (evt.getClickCount()>=2){ 
-            if (isChoiseEployee){
-                choiseJIFToOpen();
+            getSelectedUnitsFromTable(row);
+            if (evt.getClickCount()>=2){ 
+                if (isChoiseEployee){
+                    choiseJIFToOpen();
+                }
+                else{
+    //                открыть окно краткого просмотра информации
+    //                MBProgect.openAddOrChangeEmployee(); 
+                }
             }
-            else{
-//                открыть окно краткого просмотра информации
-//                MBProgect.openAddOrChangeEmployee(); 
+
+            if (evt.isPopupTrigger())
+            {         
+//                JTable source = (JTable) evt.getSource();
+//                int row = source.rowAtPoint(evt.getPoint());
+//                int column = source.columnAtPoint(evt.getPoint());
+                if ( row>=0){
+                    //source.changeSelection(row, column, false, false);`
+                    MBProgect.setSelectedEmployeeId((Integer)source.getModel().getValueAt(source.convertRowIndexToModel(row), 1));
+                    jPMBaseEmployee.show(evt.getComponent(), evt.getX(), evt.getY());
+                }
             }
-        }
-        
-        if (evt.isPopupTrigger())
-        {         
-            if ( row>=0){
-                //source.changeSelection(row, column, false, false);`
-                MBProgect.setSelectedEmployeeId(Integer.valueOf((Integer)source.getModel().getValueAt(source.convertRowIndexToModel(source.getSelectedRow()), 1)));
-                jPMBaseEmployee.show(evt.getComponent(), evt.getX(), evt.getY());
-            }
+        }catch(Exception ex){
+            System.out.println("com.Fraims.Bases.JIFEmployeesBase.jTEmployeesMouseReleased()");
         }
     }//GEN-LAST:event_jTEmployeesMouseReleased
 
@@ -926,7 +934,7 @@ public class JIFEmployeesBase extends MainInternalFrame {
     }//GEN-LAST:event_jChBDeletedActionPerformed
 
     private void jBAddEmpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBAddEmpActionPerformed
-        getSelectedUnitsFromTable();
+        getSelectedUnitsFromTable(-1);
         if (isChoiseEployee){
             choiseJIFToOpen();
         }
@@ -939,14 +947,14 @@ public class JIFEmployeesBase extends MainInternalFrame {
     }//GEN-LAST:event_jBAddEmpActionPerformed
 
     private void jMIEditEmployeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditEmployeeActionPerformed
-        getSelectedUnitsFromTable();        
+        getSelectedUnitsFromTable(-1);        
         MBProgect.openAddOrChangeEmployee();
         //MBProgect.getJIFAddorChangeEmployee().setS
         //closeThis();
     }//GEN-LAST:event_jMIEditEmployeeActionPerformed
 
     private void jMIEditMedicalBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditMedicalBookActionPerformed
-        getSelectedUnitsFromTable();
+        getSelectedUnitsFromTable(-1);
         MBProgect.openAddChangeMedicalBook();
         MBProgect.getJIFMedBookAddorChange().setNumMedicalBook(SelectedNumMedicalBook);
         //closeThis();
@@ -961,7 +969,7 @@ public class JIFEmployeesBase extends MainInternalFrame {
     }//GEN-LAST:event_jTEmployeesKeyTyped
 
     private void jMIEditInstitutionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEditInstitutionActionPerformed
-        getSelectedUnitsFromTable();
+        getSelectedUnitsFromTable(-1);
         MBProgect.setSelectedInstitutionId(SelectedInstitutionId);
         MBProgect.openAddOrChangeInstitution();
     }//GEN-LAST:event_jMIEditInstitutionActionPerformed
