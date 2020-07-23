@@ -229,7 +229,7 @@ public class MedicalBook extends MainClassProgect<MedicalBook> {
                 + "Emp.LastName, Emp.name, Emp.Patronymic, " //3
                 + "UsDepEmp.name, UsGrEmp.name, UsPosEmp.name, " //3
                 + "MainEmp.name, MainEmp.LastName, MainEmp.Patronymic, " //3
-                + "Inst.Name, Emp.InstitutionId, Emp.Berthday "//2
+                + "Inst.Name, Emp.InstitutionId, Emp.Berthday, Emp.EmploymentDate "//2
                 + "FROM `MedicalBook` MB "
                 + "Left join Employee Emp on (Emp.id = MB.EmployeeId) "
                 + "left join Employee MainEmp on (MainEmp.id = Emp.MainEmployeeId) "
@@ -513,6 +513,8 @@ public class MedicalBook extends MainClassProgect<MedicalBook> {
         MedicalBook.setInstitutionName(rs.getString(40));
         MedicalBook.setEmployeeInstitutionId(rs.getInt(41));
         MedicalBook.setEmployeeBerthday(rs.getDate(42));
+        
+        MedicalBook.setEmploymentDate(rs.getDate(43));
         return MedicalBook;
     }
 
@@ -677,35 +679,44 @@ public class MedicalBook extends MainClassProgect<MedicalBook> {
 
             HashSet<Boolean> ValidationSet = new HashSet<>();
 //            ValidationSet.add(getShigellvak().after(CurrentDayMinus1Year.getTime()));//Шигелвак не более 1 года с текущей даты 
-            result.put("Шигелвак - более 1 года", getShigellvak().after(CurrentDayMinus1Year.getTime()));
+            if (getShigellvak().before(CurrentDayMinus1Year.getTime())) result.put("Шигелвак - более 1 года", false);
 //            ValidationSet.add(getTherapist().after(CurrentDayMinus1Year.getTime()));// Терапевт не более 1 года с текущей даты
-            result.put("Терапевт - более 1 года", getTherapist().after(CurrentDayMinus1Year.getTime()));
+            if (getTherapist().before(CurrentDayMinus1Year.getTime()))result.put("Терапевт - более 1 года", false);
 //            ValidationSet.add(getOtolaryngologist().after(CurrentDayMinus1Year.getTime()));//ЛОР не более 1 года с текущей даты 
-            result.put("ЛОР - более 1 года", getOtolaryngologist().after(CurrentDayMinus1Year.getTime()));
+            if (getOtolaryngologist().before(CurrentDayMinus1Year.getTime())) result.put("ЛОР - более 1 года", false);
 //            ValidationSet.add(getDentist().after(CurrentDayMinus1Year.getTime()));//Стоматолог не более 1 года с текущей даты 
-            result.put("Стоматолог - более 1 года", getDentist().after(CurrentDayMinus1Year.getTime()));
+            if (getDentist().before(CurrentDayMinus1Year.getTime())) result.put("Стоматолог - более 1 года", false);
 //            ValidationSet.add(getPsychiatrist().after(CurrentDayMinus1Year.getTime()));//психиатор не более 1 года с текущей даты 
-            result.put("Психиатор - более 1 года", getPsychiatrist().after(CurrentDayMinus1Year.getTime()));
+            if (getPsychiatrist().before(CurrentDayMinus1Year.getTime())) result.put("Психиатор - более 1 года", false);
 //            ValidationSet.add(getExpertInNarcology().after(CurrentDayMinus1Year.getTime()));//нарколог  не более 1 года с текущей даты 
-            result.put("Нарколог - более 1 года", getExpertInNarcology().after(CurrentDayMinus1Year.getTime()));
+            if (getExpertInNarcology().before(CurrentDayMinus1Year.getTime())) result.put("Нарколог - более 1 года", false);
 //            ValidationSet.add(getDermatovenerologist().after(CurrentDayMinus1Year.getTime()));//дерматовенеролог не более 1 года с текущей даты 
-            result.put("Дерматовенеролог - более 1 года", getDermatovenerologist().after(CurrentDayMinus1Year.getTime()));
+            if (getDermatovenerologist().before(CurrentDayMinus1Year.getTime())) result.put("Дерматовенеролог - более 1 года", false);
 //            ValidationSet.add(getFluorography().after(CurrentDayMinus1Year.getTime()));//флюорография не более 1 года с текущей даты 
-            result.put("Флюорография - более 1 года", getFluorography().after(CurrentDayMinus1Year.getTime()));
+            if (getFluorography().before(CurrentDayMinus1Year.getTime())) result.put("Флюорография - более 1 года", false);
 //            ValidationSet.add(getValidation().after(CurrentDayMinus1Year.getTime()));//Аттестация  не более 1 года с текущей даты   
-            result.put("Аттестация - более 1 года", getValidation().after(CurrentDayMinus1Year.getTime()));
+            if (getValidation().before(CurrentDayMinus1Year.getTime())) result.put("Аттестация - более 1 года", false);
 //            ValidationSet.add(isValidationForYear()); // аттестация на год 
-            result.put("Аттестация - более 1 года", isValidationForYear());
+            if (!isValidationForYear()) result.put("Аттестация - более 1 года", false);
 //            ValidationSet.add(getHelminths().after(CurrentDayMinus1Year.getTime()));//Гельминты  не более 1 года с текущей даты 
-            result.put("Гельминты - более 1 года", getHelminths().after(CurrentDayMinus1Year.getTime()));
+            if (getHelminths().before(CurrentDayMinus1Year.getTime())) result.put("Гельминты - более 1 года", false);
 
 //            проработка иммунитета к АДСМ
-            result.put("АДСМ - более 10 лет", BorneDiseases.contains(EnumBorneDiseases.Diphtheria) ? true : getDiphtheria().after(CurrentDayMinus10Year.getTime()));
+            // если нет прививки и прошло более 10 лет
+            if (!BorneDiseases.contains(EnumBorneDiseases.Diphtheria) && getDiphtheria().before(CurrentDayMinus10Year.getTime())) {
+                //ValidationSet.add(!getRubella().equals(new Date(0))); // не равно нулевому значению 1970-01-01   
+                // нет прививок
+                if (getDiphtheria().equals(new Date(0)))
+                    result.put("АДСМ - нет привики", false);
+                //прошло более 10 лет с текущей даты
+                else if (getDiphtheria().before(CurrentDayMinus10Year.getTime())) result.put("АДСМ - более 10 лет", false);
+            }            
 
 //            проработка иммунитета к КРАСНУХЕ
+            //Если нет прививки и более 25 лет
             if (!BorneDiseases.contains(EnumBorneDiseases.Rubella) && getEmployeeBerthday().before(CurrentDayMinus25Year.getTime())) {
                 //ValidationSet.add(!getRubella().equals(new Date(0))); // не равно нулевому значению 1970-01-01
-                result.put("Краснуха - нет привики", !getRubella().equals(new Date(0)));
+                if (getRubella().equals(new Date(0))) result.put("Краснуха - нет привики", false);
             }
 
             //            проработка иммунитета к КОРИ     
@@ -713,9 +724,9 @@ public class MedicalBook extends MainClassProgect<MedicalBook> {
                 if (getMeasles().equals(new Date(0)) && getMeasles_2().equals(new Date(0))) {  // если нет прививок от кори
                     result.put("Корь - нет прививок", false);
                 } else if (!getMeasles().equals(new Date(0)) && getMeasles_2().equals(new Date(0))) { // если нет второй прививки от кори
-                    result.put("Корь - более 3х месяцев от текущей даты", getMeasles().after(CurrentDayMinus3Month.getTime()));
+                    if (getMeasles().before(CurrentDayMinus3Month.getTime())) result.put("Корь - более 3х месяцев от текущей даты", false); // не более 3х месяцев от текущей даты
                 } else if (!getMeasles().equals(new Date(0)) && !getMeasles_2().equals(new Date(0))) { // если есть обе прививки от кори
-                    result.put("Корь - более 3х месяцев с момента 1 прививки", getMeasles().before(DateMeasles_2Minus3Month.getTime()));
+                    if (getMeasles().after(DateMeasles_2Minus3Month.getTime())) result.put("Корь - менее 3х месяцев с момента 1 прививки", false); // не менее 3х месяцев с момента 1 прививки
                 }
             }
 //              проработка иммунитета к Гепатиту А     
@@ -726,14 +737,14 @@ public class MedicalBook extends MainClassProgect<MedicalBook> {
                     result.put("Гепатит А - нет прививок", false);
                 } else if (!getHepatitis_A().equals(new Date(0)) && getHepatitis_A2().equals(new Date(0))) { // если нет второй прививки от геппатитаА
                     //ValidationSet.add(getHepatitis_A().after(CurrentDayMinus1Year.getTime())); // не более 1 год от текущей даты
-                    result.put("Гепатит А - прошло больше 1 года от текущей даты", getHepatitis_A().after(CurrentDayMinus1Year.getTime()));
+                    if (getHepatitis_A().before(CurrentDayMinus1Year.getTime())) result.put("Гепатит А - прошло больше 1 года от текущей даты", false);
                 } else if (!getHepatitis_A().equals(new Date(0)) && !getHepatitis_A2().equals(new Date(0))) { // если есть обе прививки от геппатитаА
 //                    ValidationSet.add(getHepatitis_A().after(DateHepatitis_A2Minus1Year.getTime()) // не более 1 года между 1 и 2 
 //                            && getHepatitis_A().before(DateHepatitis_A2Minus180Day.getTime()) // не менее 180 дней между 1 и 2 и
 //                            && getHepatitis_A2().after(CurrentDayMinus10Year.getTime()));  // не более 10 лет между 2 и текущей датой  
-                    result.put("Гепатит А - более 1 года между 1 и 2 прививок", getHepatitis_A().after(DateHepatitis_A2Minus1Year.getTime()));
-                    result.put("Гепатит А - меньше 6 месяцев между 1 и 2 прививок", getHepatitis_A().before(DateHepatitis_A2Minus180Day.getTime()));
-                    result.put("Гепатит А - больше 10 лет между 1 и 2 прививок", getHepatitis_A2().after(CurrentDayMinus10Year.getTime()));
+                    if (getHepatitis_A().before(DateHepatitis_A2Minus1Year.getTime())) result.put("Гепатит А - более 1 года между 1 и 2 прививок", false);
+                    if (getHepatitis_A().after(DateHepatitis_A2Minus180Day.getTime())) result.put("Гепатит А - меньше 6 месяцев между 1 и 2 прививок", false);
+                    if (getHepatitis_A2().before(CurrentDayMinus10Year.getTime())) result.put("Гепатит А - больше 10 лет от текущей даты", false);
                 }
             }
 //                проработка иммунитета к ГепатитуВ     
@@ -746,23 +757,23 @@ public class MedicalBook extends MainClassProgect<MedicalBook> {
                     result.put("Гепатит B - нет прививок", false);
                 } else if (!getHepatitis_B().equals(new Date(0)) && getHepatitis_B2().equals(new Date(0)) && getHepatitis_B3().equals(new Date(0))) { // если нет второй прививки от ГепатитуВ
 //                        ValidationSet.add(getHepatitis_B().after(CurrentDayMinus35Day.getTime())); // не более 35 дней от текущей даты до 1 прививки
-                    result.put("Гепатит B - более 35 дней от текущей даты", false);
+                    if (getHepatitis_B().before(CurrentDayMinus35Day.getTime())) result.put("Гепатит B - более 35 дней от текущей даты", false);
                 } else if (!getHepatitis_B().equals(new Date(0)) && !getHepatitis_B2().equals(new Date(0)) && getHepatitis_B3().equals(new Date(0))) {
 //                        ValidationSet.add(getHepatitis_B2().after(CurrentDayMinus5Month5Day.getTime()) // не более 5 месяцев и 5 дней от 2 прививки до текущей даты
 //                        && getHepatitis_B().before(DateHepatitis_B2Minus30Day.getTime()) // не менее 30 дней между 1 и 2       
 //                        && getHepatitis_B().after(DateHepatitis_B2Minus35Day.getTime())); // не более 35 дней между 1 и 2     
-                    result.put("Гепатит B - более 5 месяцев и 5 дней от 2 прививки до текущей даты", getHepatitis_B2().after(CurrentDayMinus5Month5Day.getTime()));
-                    result.put("Гепатит B - более 30 дней меду 1 и 2 прививкой", getHepatitis_B().before(DateHepatitis_B2Minus30Day.getTime()));
-                    result.put("Гепатит B - менее 35 дней между 1 и 2 прививкой", getHepatitis_B().after(DateHepatitis_B2Minus35Day.getTime()));
+                    if (getHepatitis_B2().before(CurrentDayMinus5Month5Day.getTime())) result.put("Гепатит B - более 5 месяцев и 5 дней от 2 прививки до текущей даты", false);
+                    if (getHepatitis_B().after(DateHepatitis_B2Minus30Day.getTime())) result.put("Гепатит B - менее 30 дней между 1 и 2 прививкой", false);
+                    if (getHepatitis_B().before(DateHepatitis_B2Minus35Day.getTime())) result.put("Гепатит B - более 35 дней между 1 и 2 прививкой", false);
                 } else if (!getHepatitis_B().equals(new Date(0)) && !getHepatitis_B2().equals(new Date(0)) && !getHepatitis_B3().equals(new Date(0))) {
 //                        ValidationSet.add(getHepatitis_B2().after(DateHepatitis_B3Minus5Motnth5Day.getTime()) // не более 5 месяцев и 5 дней между 3 и 2
 //                        && getHepatitis_B2().before(DateHepatitis_B3Minus5Month.getTime()) // не менее 5 месяцев между 3 и 2   
 //                        && getHepatitis_B().after(DateHepatitis_B2Minus35Day.getTime()) // не более 35 дней между 1 и 2 
 //                        && getHepatitis_B().before(DateHepatitis_B2Minus30Day.getTime())); // не менее 30 дней между 2 и 1     
-                    result.put("Гепатит B - более 5 месяцев и 5 дней между 3 и 2", getHepatitis_B2().after(DateHepatitis_B3Minus5Motnth5Day.getTime()));
-                    result.put("Гепатит B - менее 5 месяцев между 3 и 2", getHepatitis_B2().before(DateHepatitis_B3Minus5Month.getTime()));
-                    result.put("Гепатит B - более 35 дней между 1 и 2", getHepatitis_B().after(DateHepatitis_B2Minus35Day.getTime()));
-                    result.put("Гепатит B - менее 30 дней между 2 и 1", getHepatitis_B().before(DateHepatitis_B2Minus30Day.getTime()));
+                    if (getHepatitis_B2().before(DateHepatitis_B3Minus5Motnth5Day.getTime())) result.put("Гепатит B - более 5 месяцев и 5 дней между 3 и 2", false);
+                    if (getHepatitis_B2().after(DateHepatitis_B3Minus5Month.getTime())) result.put("Гепатит B - менее 5 месяцев между 3 и 2", false);
+                    if (getHepatitis_B().before(DateHepatitis_B2Minus35Day.getTime())) result.put("Гепатит B - более 35 дней между 1 и 2", false);
+                    if (getHepatitis_B().after(DateHepatitis_B2Minus30Day.getTime())) result.put("Гепатит B - менее 30 дней между 2 и 1", false);
                 }
             }
 
@@ -771,27 +782,27 @@ public class MedicalBook extends MainClassProgect<MedicalBook> {
                 //Кишечная инфекция 
                 if (!getIntestinalInfection().equals(new Date(0))) {
                     //ValidationSet.add(getEmploymentDate().after(new Date(getIntestinalInfection().getTime() - 604800000L)));//Кишечная инфекция не более 7 дней с даты трудоустройства       
-                    result.put("Кишечная инфекция - более 7 дней с даты трудоустройства", getEmploymentDate().after(new Date(getIntestinalInfection().getTime() - 604800000L)));
+                    if (getIntestinalInfection().before(new Date(getEmploymentDate().getTime() - 604800000L))) result.put("Кишечная инфекция - более 7 дней с даты трудоустройства", false);
                 } 
                 //Брюшной тиф 
                 if (!getTyphoidFever().equals(new Date(0))) {
 //                    ValidationSet.add(getEmploymentDate().after(new Date(getTyphoidFever().getTime() - 604800000L)));//Брюшной тиф   не более 7 дней с даты трудоустройства     
-                    result.put("Брюшной тиф - более 7 дней с даты трудоустройства", getEmploymentDate().after(new Date(getTyphoidFever().getTime() - 604800000L)));
+                    if (getTyphoidFever().before(new Date(getEmploymentDate().getTime() - 604800000L))) result.put("Брюшной тиф - более 7 дней с даты трудоустройства", false);
                 } 
                 //Стаффилокок
                 if (!getStaphylococcus().equals(new Date(0))) {
 //                    ValidationSet.add(getEmploymentDate().after(new Date(getStaphylococcus().getTime() - 604800000L)));//Стаффилокок  не более  7 дней с даты трудоустройства     
-                    result.put("Гепатит B - более 35 дней от текущей даты", getEmploymentDate().after(new Date(getStaphylococcus().getTime() - 604800000L)));
+                    if (getStaphylococcus().before(new Date(getEmploymentDate().getTime() - 604800000L))) result.put("Стафилококк - более 7 дней с даты трудоустройства", false);
                 } 
             } else {
 //                ValidationSet.add(false);
                 result.put("Дата трудоустройства не установлена", false);
             }
 
-            Valid = ValidationSet.size() > 1 ? false : ValidationSet.contains(true);
+            Valid = result.containsValue(false);
         } catch (Exception ex) {
             System.out.println("com.Class.MedicalBook.checkValidMedicalBook() - " + ex.getMessage());
-//            Valid = false;
+            Valid = false;
             result.put("Неизвестная ошибка - "+ ex.getMessage(), false);
         }
         return result;

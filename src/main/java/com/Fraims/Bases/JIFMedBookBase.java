@@ -466,7 +466,7 @@ public class JIFMedBookBase extends MainInternalFrame {
                 java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, true, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -481,6 +481,11 @@ public class JIFMedBookBase extends MainInternalFrame {
         jTMedaicalBook.setInheritsPopupMenu(true);
         jTMedaicalBook.setShowHorizontalLines(false);
         jTMedaicalBook.setShowVerticalLines(false);
+        jTMedaicalBook.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                jTMedaicalBookMouseMoved(evt);
+            }
+        });
         jTMedaicalBook.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jTMedaicalBookMouseClicked(evt);
@@ -502,7 +507,6 @@ public class JIFMedBookBase extends MainInternalFrame {
             jTMedaicalBook.getColumnModel().getColumn(5).setResizable(false);
             jTMedaicalBook.getColumnModel().getColumn(6).setResizable(false);
             jTMedaicalBook.getColumnModel().getColumn(7).setResizable(false);
-            jTMedaicalBook.getColumnModel().getColumn(8).setResizable(false);
             jTMedaicalBook.getColumnModel().getColumn(9).setResizable(false);
             jTMedaicalBook.getColumnModel().getColumn(10).setResizable(false);
         }
@@ -963,6 +967,29 @@ public class JIFMedBookBase extends MainInternalFrame {
         //getChoiseEmployeeId();
         //System.out.println(evt.getButton());
     }//GEN-LAST:event_jTMedaicalBookMouseClicked
+
+    private void jTMedaicalBookMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTMedaicalBookMouseMoved
+        try {
+            JTable source = (JTable) evt.getSource();
+            int row = source.rowAtPoint(evt.getPoint());
+            int column = source.columnAtPoint(evt.getPoint());
+            if (row >= 0 && column == 8) {
+                StringBuilder TollTip = new StringBuilder(source.getModel().getValueAt(source.convertRowIndexToModel(row), column).toString());
+                String[] text1 = TollTip.toString().split(", ");
+                StringBuilder Str2 = new StringBuilder();
+                Str2.append("<HTML>");
+                for (int i = 0; i < text1.length; i++) {
+                    Str2.append(text1[i]);
+                    Str2.append("<br>");
+                }
+                source.setToolTipText(Str2.toString());
+            } else {
+                source.setToolTipText(null);
+            }
+        } catch (Exception ex) {
+            System.out.println("com.Fraims.Bases.JIFMedBookBase.jTMedaicalBookMouseMoved()");
+        }
+    }//GEN-LAST:event_jTMedaicalBookMouseMoved
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

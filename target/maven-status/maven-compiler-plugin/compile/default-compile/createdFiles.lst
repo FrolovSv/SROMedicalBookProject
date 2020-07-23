@@ -354,6 +354,7 @@ com\Fraims\AddOrChange\JIFInstitutionAddOrChange$9.class
 com\Fraims\AddOrChange\JIFInstitutionAddOrChange$17.class
 com\Fraims\AddOrChange\JIFUserPrivilegeChange$13.class
 com\Fraims\Bases\JIFEmployeesBase$16.class
+com\Fraims\Bases\JIFMedBookBase$26.class
 com\Fraims\AddOrChange\JIFEmployeeMedlBookAddorChange$18.class
 com\Fraims\AddOrChange\JIFUserPrivilegeChange$59.class
 com\Fraims\Preload\NewJDialog$2.class
